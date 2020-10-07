@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     res.send(movies);
 }) 
 
-// return by customer id
+// return by movie id
 router.get('/:id', async (req, res) => {
     const movie = await Movie.findById(req.params.id);
 
@@ -26,7 +26,10 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const movie = await Movie.findByIdAndUpdate(req.params.id, {
         title: req.body.title,
-        genre: req.body.genre,
+        genre: {
+            id: req.body.genre.id,
+            name: req.body.genre.name,
+        },
         numberInStock: req.body.numberInStock,
         dailyRentalRate: req.body.dailyRentalRate
     }, { new: true });
@@ -37,10 +40,18 @@ router.put('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    // 
+    const { error } = validate(req.body);   // checking the input format provided by customer
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const genre = await Genre.findById(req.body.genreId);       // REMEMBER! The customer is sending the genreID as input, not the genre itself!
+    if (!genre) return res.status(400).send('Invalid genre');
+
     let movie = new Movie({
         title: req.body.title,
-        genre: req.body.genre,
+        genre: {
+            _id: genre._id,
+            name: genre.name
+        },
         numberInStock: req.body.numberInStock,
         dailyRentalRate: req.body.dailyRentalRate
     })
@@ -58,6 +69,8 @@ router.delete('/:id', async (req, res) => {
     res.send(movie);
 })
 
+// create movie
+// update author
 
 
 module.exports = router;

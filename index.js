@@ -7,10 +7,13 @@ const { countReset } = require('console');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { env } = require('process');
+const mongoose = require('mongoose');
+
+const home = require('./routes/home');
+const rentals = require('./routes/rentals');
 const genres = require('./routes/genres');
 const customers = require('./routes/customers');
-const home = require('./routes/home');
-const mongoose = require('mongoose');
+const movies = require('./routes/movies');
 
 const app = express();
 
@@ -21,9 +24,13 @@ app.use(express.json());
 app.use(middleware.logger);
 app.use(middleware.authenticator);
 app.use(helmet());
+
+app.use('/', home);
 app.use('/api/genres', genres);
 app.use('/api/customers', customers);
-app.use('/', home);
+app.use('./api/rentals', rentals);
+app.use('./api/movies', movies);
+
 
 // MongoDB stuff
 // 1. Connect to database
