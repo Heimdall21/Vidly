@@ -1,6 +1,6 @@
 const { Customer, validate } = require('../models/customer');
-const mongoose = require('mongoose');
 const express = require('express');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -8,13 +8,13 @@ const router = express.Router();
 // 3. Customer endpoint functions
 
 // return all customer info
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     const customers = await Customer.find();
     res.send(customers);
 }) 
 
 // return by customer id
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     const customer = await Customer.findById(req.params.id);
 
     // don't forget to do error handling!
@@ -23,7 +23,7 @@ router.get('/:id', async (req, res) => {
     res.send(customer);
 }) 
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     const customer = await Customer.findByIdAndUpdate(req.params.id, {
         isGold: req.body.isGold,
         name: req.body.name,
@@ -35,7 +35,7 @@ router.put('/:id', async (req, res) => {
     res.send(customer);
 })
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     // 
     let customer = new Customer({
         isGold: req.body.isGold,
@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
     res.send(customer);
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     const customer = await Customer.findByIdAndRemove(req.params.id);
 
     if (!customer) return res.status(404).send('The customer with the given id was not found'); // 404 - object not found - convention of RESTful API

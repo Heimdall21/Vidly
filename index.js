@@ -1,6 +1,9 @@
+
+const config = require('config');
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 const startupDebugger = require('debug')('app:startup');
 const dbDebugger = require('debug')('app:db');
-const config = require('config');
 const express = require('express');
 const middleware = require('./middleware');
 const { countReset } = require('console');
@@ -14,6 +17,8 @@ const rentals = require('./routes/rentals');
 const genres = require('./routes/genres');
 const customers = require('./routes/customers');
 const movies = require('./routes/movies');
+const users = require('./routes/users');
+const auth = require('./routes/auth');
 
 const app = express();
 
@@ -28,15 +33,23 @@ app.use(helmet());
 app.use('/', home);
 app.use('/api/genres', genres);
 app.use('/api/customers', customers);
-app.use('./api/rentals', rentals);
-app.use('./api/movies', movies);
+app.use('/api/rentals', rentals);
+app.use('/api/movies', movies);
+app.use('/api/users', users);
+app.use('/api/auth', auth);
 
+
+if (!config.get('jwtPrivateKey')) {
+    console.error('FATAL ERROR: jwtPrivateKey is not defined.');
+    // this is one of the global objects in node
+    process.exit(1);
+}
 
 // MongoDB stuff
 // 1. Connect to database
 mongoose.connect('mongodb://localhost/vidly')
-    .then(() => console.log('Connected to MongoDB Vidly genres'))
-    .catch(err => console.error('Could not connect to MongoDB Vidly genres: ', err));
+    .then(() => console.log('Connected to MongoDB Vidly'))
+    .catch(err => console.error('Could not connect to MongoDB Vidly: ', err));
 
 // Debug settings
 dbDebugger('Connected to the database ...');

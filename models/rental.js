@@ -13,7 +13,7 @@ const rentalSchema = mongoose.Schema({
             },
             isGold: {
                 type: Boolean,
-                required: true
+                default: false
             },
             phone: {
                 type: String,
@@ -21,20 +21,38 @@ const rentalSchema = mongoose.Schema({
                 minLength: 5, 
                 maxLength: 50
             }
-        })
+        }),
+        required: true
+    },
+    movie: {
+        type: new mongoose.Schema({
+            title: {
+                type: String, 
+                required: true,
+                trim: true,
+                minLength: 5,
+                maxLength: 255
+            },
+            dailyRentalRate: {
+                type: Number,
+                required: true,
+                min: 0,
+                max: 255
+            }
+        }),
+        required: true
     },
     dateOut: {
         type: String, 
         required: true, 
         default: Date.now
     },
-    dateDue: {
-        type: String
+    dateReturned: {
+        type: Date
     },
     rentalFee: {
         type: Number, 
         min: 0,
-        required: true
     },
     isOverdue: Boolean,     // if overdue, include the overdue penalty
 })
@@ -43,10 +61,10 @@ const rentalSchema = mongoose.Schema({
 const Rental = mongoose.model('Rental', rentalSchema);
 
 function validateRental (movie) {
-    console.log("this is the genre input: ", genre);
+    //console.log("this is the genre input: ", genre);
     const schema = {
-        customerId: Joi.string().required(),
-        movieId: Joi.string().required(),
+        customerId: Joi.objectId().required(),
+        movieId: Joi.objectId().required(),
     }
     return Joi.validate(movie, schema); 
 }

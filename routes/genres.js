@@ -2,6 +2,8 @@ const { Genre, validate } = require('../models/genre');
 const express = require('express');
 const Joi = require('joi');     // Joi is a class 
 const mongoose = require('mongoose');
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 const router = express.Router();
 
@@ -24,16 +26,11 @@ function spliceGenreData(genres) {
     return cleanedGenres;
 }
 
-async function updateGenreByID(genreID, genreName) {
-    
-}
-
-
 
 // Express Endpoints
 
 // endpoint no.1
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     // 1. Retrieve all documents
     // 2. send it
     const genres = await retrieveGenre();
@@ -57,24 +54,25 @@ router.get('/:id', async (req, res) => {
 })
 
 // this is yet another endpoint
-router.post('/', async (req, res) => {   // ???
-    //console.log("inside post");
-    //console.log(req.body);
+router.post('/', auth, async (req, res) => {   // ???
+    
+  
     //const { error } = validate(req.body); 
     //if (error) return res.status(400).send(error.details[0].message);      // 400 Bad Request
-    
-    //console.log("This is the req.body.name: ", req);
 
     let genre = new Genre({ name: req.body.name });
+    console.log(genre);
     genre = await genre.save();
+
 
     // 2. Send to website
     res.send(genre);
+    
 })
 
 
 // this is a unique route end - for replacing data
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
 
     // validate
     // if invalid request, return 400 - Bad Request
@@ -96,7 +94,7 @@ router.put('/:id', async (req, res) => {
 })
 
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
 
     const genre = await Genre.findByIdAndRemove(req.params.id);
 

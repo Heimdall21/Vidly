@@ -1,12 +1,15 @@
 const { Rental , validate } = require('../models/rental');
 const mongoose = require('mongoose');
 const express = require('express');
+const Fawn = require('fawn');
+const auth = require('../middleware/auth');
 
 const { Customer } = require('../models/customer');
 const {Movie } = require('../models/movie');
 
 const router = express.Router();
 
+Fawn.init(mongoose);
 
 // Create a new Rental 
 // POST /api/rental
@@ -16,13 +19,13 @@ const router = express.Router();
 
 
 // return all rental info
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     const rentals = await Rental.find().sort('-dateOut');       // this is sorting by "dateOut" in descending order
     res.send(rentals);
 }) 
 
 // return by rental id
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     const rental = await Rental.findById(req.params.id);
 
     // don't forget to do error handling!
@@ -31,7 +34,7 @@ router.get('/:id', async (req, res) => {
     res.send(rental);
 }) 
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     const rental = await Rental.findByIdAndUpdate(req.params.id, {
         dateBorrowed: req.body.dateBorrowed,
         dateDue: req.body.dateDue,
@@ -44,10 +47,11 @@ router.put('/:id', async (req, res) => {
     res.send(rental);
 })
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     // validate the request
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
+
     // get the customer details using the input customerId
     const customer = await Customer.findById(req.body.customerId);
     if (!customer) return res.status(400).send('Invalid customer');
@@ -72,26 +76,31 @@ router.post('/', async (req, res) => {
         }
     })
 
-    rental = await rental.save();
-
-    // update the number of movies in stock
+    /* rental = await rental.save();
     movie.numberInStock--;
     movie.save();
-
-    res.send(rental);
+    res.send(rental); */
+    try {
+        new Fawn.Task()
+            .save('rentals', rental)
+            .update('movies', { _id: movie._id}, {
+                $inc: { numberInStock: -1 }
+            })
+            .run();
+        res.send(rental);
+    }
+    catch (ex){
+        res.status(500).send("Internal server error");
+    }  
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     const rental = await Rental.findByIdAndRemove(req.params.id);
 
     if (!rental) return res.status(404).send('The rental with the given id was not found'); // 404 - object not found - convention of RESTful API
 
     res.send(rental);
 })
-
-
-
-
 
 
 module.exports = router;

@@ -1,13 +1,12 @@
-const Joi = require('joi'); 
 const mongoose = require('mongoose');
 const { genreSchema } = require('./genre');
 
-const movieSchema = mongoose.Schema({
+const movieSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
         trim: true,
-        minLength: 5,
+        minLength: 3,
         maxLength: 255,
     },
     genre: {
@@ -33,8 +32,8 @@ const Movie = mongoose.model('Movie', movieSchema);
 
 function validateMovie (movie) {
     const schema = {
-        title: Joi.string().min(3).max(30).required(),
-        genreId: Joi.string().required(),           // we want the customer to only send the genreID
+        title: Joi.string().min(3).max(255).required(),
+        genreId: Joi.onjectId().required(),           // we want the customer to only send the genreID
         numberInStock: Joi.number().min(0).required(),
         dailyRentalRate: Joi.number().min(0).required()
 
