@@ -1,6 +1,6 @@
 const winston = require('winston');
 
-module.exports = function error(err, req, res, next) {
+module.exports = function(err, req, res, next) {
     winston.error(err.message, err);
 
     // error
@@ -10,5 +10,5 @@ module.exports = function error(err, req, res, next) {
     // debug
     // silly
 
-    res.status(500).send("Internal server error.");
+    res.status(500).send("Internal server error ERROR.JS.");
 }

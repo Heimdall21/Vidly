@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const asyncMiddleware = require('../middleware/async');
+const validateObjectId = require('../middleware/validateObjectId');
 
 const router = express.Router();
 
@@ -12,36 +13,32 @@ const router = express.Router();
 // Express Endpoints
 
 // endpoint no.1
-router.get('/', auth, asyncMiddleware(async (req, res) => {
-    throw new Error('Could not get the genres');
+router.get('/', asyncMiddleware(async (req, res) => {       // removed the "auth" middleware
+    //throw new Error('Could not get the genres');
     const genres = await Genre.find().sort('name');  
     res.send(genres);  
 }));
 
 // endpoint no.2
-router.get('/:id', async (req, res) => { 
-    // 1. Retrieve correct id'd documented
-    //const genre = await retrieveGenreById(req.params.id);
+router.get('/:id', validateObjectId, async (req, res) => { 
+
     const genre = await Genre.findById(req.params.id);
     if (!genre) return res.status(404).send('The genre with the given id was not found'); // 404 - object not found - convention of RESTful API
 
-    // 2. send to the website
     res.send(genre);
 })
 
 // this is yet another endpoint
 router.post('/', auth, asyncMiddleware(async (req, res) => {   
-    //const { error } = validate(req.body); 
-    //if (error) return res.status(400).send(error.details[0].message);      // 400 Bad Request
+    const { error } = validate(req.body); 
+    if (error) return res.status(400).send(error.details[0].message);      // 400 Bad Request
 
     let genre = new Genre({ name: req.body.name });
     console.log(genre);
     genre = await genre.save();
 
-
     // 2. Send to website
     res.send(genre);
-    
 }))
 
 

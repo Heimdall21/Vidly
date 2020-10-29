@@ -10,6 +10,6 @@ module.exports = function() {
 
         // Configuration
     console.log('Application Name: ' + config.get('name'));
-    console.log('Mail Server: ' + config.get('mail.host'));
+   // console.log('Mail Server: ' + config.get('mail.host'));
     //console.log('Mail Password: ' + config.get('mail.password'));
 }

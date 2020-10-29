@@ -4,7 +4,7 @@
   "description": "\"# Vidly\"",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll"
+    "test": "jest --watchAll --verbose"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "winston-mongodb": "^5.0.5"
   },
   "devDependencies": {
-    "jest": "^26.6.0"
+    "jest": "^26.6.0",
+    "supertest": "^5.0.0"
   }
 }

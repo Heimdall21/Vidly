@@ -4,7 +4,12 @@ const mongoose = require('mongoose');
 // 2. Define data variable schema which gives a class
 const genreSchema = new mongoose.Schema({
     id: Number,
-    name: String,
+    name: {
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 50
+    },
     date: {type: Date, default: Date.now}
 })
 
@@ -14,7 +19,7 @@ const Genre = mongoose.model('Genre', genreSchema);
 function validateGenre (genre) {
     console.log("this is the genre input: ", genre);
     const schema = {
-        name: Joi.string().min(3).required()
+        name: Joi.string().min(5).max(50).required()
     }
     return Joi.validate(genre, schema); 
 }
