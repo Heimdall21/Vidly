@@ -4,7 +4,7 @@
   "description": "\"# Vidly\"",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll --verbose"
+    "test": "jest --watchAll --verbose --coverage --runInBand"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "joi-objectid": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
+    "moment": "^2.29.1",
     "mongoose": "^5.0.1",
     "morgan": "^1.10.0",
     "nodeman": "^1.1.2",
