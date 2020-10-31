@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const { env } = require('process');
 const winston = require('winston');
 
+
 const app = express();
 //require('./startup/logging')();
 require('./startup/logging');
@@ -15,6 +16,7 @@ require('./startup/routes')(app);
 require('./startup/db')();
 require('./startup/config')();
 require('./startup/validation')();
+require('./startup/prod')(app);
 
 app.use(middleware.logger);
 app.use(middleware.authenticator);
